@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>EVA: Aligning Video World Models with Executable Robot Actions via Inverse Dynamics Rewards</title>
+  <meta
+    name="description"
+    content="Project page for EVA, a reward-aligned post-training framework that bridges visually plausible video rollouts and executable robot actions."
+  >
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  >
+  <link rel="stylesheet" href="assets/css/site-final-20260318.css">
+</head>
+<body id="top">
+  <div class="page-glow page-glow-left" aria-hidden="true"></div>
+  <div class="page-glow page-glow-right" aria-hidden="true"></div>
+
+  <header class="hero-shell">
+    <nav class="top-nav" aria-label="Primary">
+      <a class="brand-mark" href="#top">EVA</a>
+      <div class="nav-links">
+        <a href="#abstract">Abstract</a>
+        <a href="https://www.youtube.com/watch?v=rLXB7_iNnXw" target="_blank" rel="noreferrer">Video</a>
+        <a href="#generated-video-plans">Generated Video Plans</a>
+        <a href="#novel-task-rollouts">Novel task rollouts</a>
+        <a href="#qualitative-comparisons">Qualitative Comparisons</a>
+        <a href="#real-world-experiments">Real-world Experiments</a>
+        <a href="#reward-analysis">Reward Analysis</a>
+      </div>
+    </nav>
+
+    <section class="hero-stack section-shell">
+      <div class="hero-copy reveal">
+        <h1>EVA: Aligning Video World Models with Executable Robot Actions via Inverse Dynamics Rewards</h1>
+
+        <div class="hero-meta">
+          <p class="authors-line">
+            <a href="https://robbinw.github.io/" target="_blank" rel="noreferrer">Ruixiang Wang<sup>1,2</sup></a>,
+            <a href="https://github.com/MobiusLqm" target="_blank" rel="noreferrer">Qingming Liu<sup>1</sup></a>,
+            <a href="https://yuecideng.github.io/" target="_blank" rel="noreferrer">Yueci Deng<sup>1,2</sup></a>,
+            <a href="https://guiliang.me/" target="_blank" rel="noreferrer">Guiliang Liu<sup>1</sup></a>,
+            <a href="https://itszhen.com/" target="_blank" rel="noreferrer">Zhen Liu<sup>1</sup><sup>&dagger;</sup></a>,
+            <a href="https://kuijia.site/" target="_blank" rel="noreferrer">Kui Jia<sup>1</sup></a>
+          </p>
+
+          <div class="affiliations-line">
+            <div class="affiliation-row">
+              <img
+                class="affiliation-logo"
+                src="https://www.urongda.com/images/normal/medium/the-chinese-university-of-hong-kong-shenzhen-logo-1024px.png"
+                alt="The Chinese University of Hong Kong, Shenzhen logo"
+                onerror="this.style.display='none'"
+              >
+              <p class="affiliation-line"><sup>1</sup> The Chinese University of Hong Kong, Shenzhen</p>
+            </div>
+            <div class="affiliation-row">
+              <img
+                class="affiliation-logo dexforce-icon"
+                src="assets/images/dexforce-official-icon.png"
+                alt="DexForce icon"
+              >
+              <p class="affiliation-line"><sup>2</sup> DexForce Technology Co., Ltd.</p>
+            </div>
+          </div>
+          <p class="corresponding-line"><sup>&dagger;</sup>Corresponding author</p>
+        </div>
+
+        <div class="cta-row">
+          <a class="cta-button" href="./" target="_blank" rel="noreferrer">
+            <span class="cta-icon cta-icon-badge" aria-hidden="true">arXiv</span>
+            <span>Paper</span>
+          </a>
+          <a class="cta-button" href="./" rel="noreferrer">
+            <span class="cta-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img" focusable="false" aria-hidden="true">
+                <path d="M12 2C6.48 2 2 6.59 2 12.24c0 4.52 2.87 8.35 6.84 9.7.5.1.68-.22.68-.48 0-.24-.01-1.03-.01-1.87-2.78.62-3.37-1.2-3.37-1.2-.46-1.18-1.11-1.49-1.11-1.49-.91-.64.07-.63.07-.63 1 .07 1.53 1.05 1.53 1.05.9 1.57 2.36 1.12 2.94.85.09-.67.35-1.12.63-1.38-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05A9.31 9.31 0 0 1 12 6.84c.85 0 1.7.12 2.5.35 1.9-1.33 2.74-1.05 2.74-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.95.68 1.92 0 1.39-.01 2.5-.01 2.84 0 .26.18.59.69.48A10.28 10.28 0 0 0 22 12.24C22 6.59 17.52 2 12 2Z" fill="currentColor"/>
+              </svg>
+            </span>
+            <span>Code</span>
+          </a>
+          <a class="cta-button" href="https://www.youtube.com/watch?v=rLXB7_iNnXw" target="_blank" rel="noreferrer">
+            <span class="cta-icon" aria-hidden="true">
+              <svg viewBox="0 0 24 24" role="img" focusable="false" aria-hidden="true">
+                <path d="M23.5 6.2a2.96 2.96 0 0 0-2.08-2.1C19.6 3.6 12 3.6 12 3.6s-7.6 0-9.42.5A2.96 2.96 0 0 0 .5 6.2 31.8 31.8 0 0 0 0 12a31.8 31.8 0 0 0 .5 5.8 2.96 2.96 0 0 0 2.08 2.1c1.82.5 9.42.5 9.42.5s7.6 0 9.42-.5a2.96 2.96 0 0 0 2.08-2.1A31.8 31.8 0 0 0 24 12a31.8 31.8 0 0 0-.5-5.8ZM9.6 15.65V8.35L15.85 12 9.6 15.65Z" fill="currentColor"/>
+              </svg>
+            </span>
+            <span>Video</span>
+          </a>
+        </div>
+
+        <p class="hero-tldr">
+          <strong>TL;DR:</strong> EVA bridges the executability gap by aligning video generation with embodiment-aware action rewards, leading to more executable visual plans and better real-world control.
+        </p>
+      </div>
+
+      <div class="hero-media reveal">
+        <div class="media-card">
+          <video
+            class="hero-video"
+            src="assets/videos/teaser-video-final-20260318.mp4"
+            poster="assets/images/posters/eva-teaser-final-20260318.jpg"
+            muted
+            loop
+            playsinline
+            preload="metadata"
+            data-inline-video
+          ></video>
+        </div>
+      </div>
+    </section>
+  </header>
+
+  <main>
+    <section id="abstract" class="section-shell content-shell content-section reveal">
+      <div class="section-header section-header-centered">
+        <h2 class="section-title-simple">Abstract</h2>
+      </div>
+      <div class="body-card prose-card prose-card-large abstract-card">
+        <p>
+        Video generative models are increasingly used as world models for robotics, where a model generates a future visual rollout conditioned on the current observation and task instruction, and an inverse dynamics model (IDM) converts the generated frames into executable robot actions. However, current video world models lack explicit executability constraints. As a result, visually coherent rollouts may still violate rigid-body and kinematic consistency, producing unstable or infeasible control commands when decoded by an IDM. We refer to this mismatch between visual generation and physically executable control as the <em>executability gap</em>. While this gap can be mitigated at inference time using techniques such as rejection sampling, such approaches are inefficient due to the high cost of video generation. In this paper, we leverage the executability gap as a training signal and introduce <strong>Executable Video Alignment (EVA)</strong>, a reinforcement-learning post-training framework for aligning video world models. EVA trains an inverse dynamics model on real robot trajectories and repurposes it as a reward model that evaluates generated videos through the action sequences they induce, encouraging smooth motions measured by velocity, acceleration, and jerk while penalizing actions that violate embodiment constraints. Importantly, the reward remains informative even when generated videos contain severe visual artifacts, since such artifacts typically translate into unstable or out-of-bound actions. Experiments on the RoboTwin benchmark and a real bimanual robot show that EVA reduces embodiment-specific artifacts in generated rollouts and improves downstream task execution success.
+        </p>
+      </div>
+      <div class="video-embed-card body-card">
+        <div class="video-embed-shell">
+          <iframe
+            src="https://www.youtube.com/embed/rLXB7_iNnXw"
+            title="EVA project video"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+            allowfullscreen
+          ></iframe>
+        </div>
+      </div>
+    </section>
+
+    <section id="generated-video-plans" class="section-shell content-shell content-section reveal">
+      <div class="section-header section-header-centered">
+        <h2 class="section-title-simple">Generated Video Plans</h2>
+      </div>
+      <p class="section-subtitle">
+        Given an observation and task description, We generated video plans of how the robot would perform the task.
+      </p>
+      <div class="video-carousel body-card" data-carousel>
+        <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous video">&#10094;</button>
+
+        <div class="carousel-viewport">
+          <figure class="carousel-slide is-active">
+            <video controls playsinline preload="metadata">
+              <source src="assets/videos/generated-plan-tray-cloth.mp4" type="video/mp4">
+            </video>
+            <figcaption>Grasp the blue towel and wipe the white tray.</figcaption>
+          </figure>
+
+          <figure class="carousel-slide">
+            <video controls playsinline preload="metadata">
+              <source src="assets/videos/generated-plan-basket-toy.mp4" type="video/mp4">
+            </video>
+            <figcaption>Grasp the plush toy and place it into the basket.</figcaption>
+          </figure>
+
+          <figure class="carousel-slide">
+            <video controls playsinline preload="metadata">
+              <source src="assets/videos/generated-plan-bowl-sort.mp4" type="video/mp4">
+            </video>
+            <figcaption>Pick up the red block with the right arm and place it into the middle blue bowl.</figcaption>
+          </figure>
+
+          
+          <figure class="carousel-slide">
+            <video controls playsinline preload="metadata">
+              <source src="assets/videos/generated-plan-yellow-cloth-bowls.mp4" type="video/mp4">
+            </video>
+            <figcaption>Pick up the yellow towel and drop it into the middle bowl.</figcaption>
+          </figure>
+
+          <figure class="carousel-slide">
+            <video controls playsinline preload="metadata">
+              <source src="assets/videos/generated-plan-tray-packet.mp4" type="video/mp4">
+            </video>
+            <figcaption>Pull out a tissue using the right arm.</figcaption>
+          </figure>
+
+          <figure class="carousel-slide">
+            <video controls playsinline preload="metadata">
+              <source src="assets/videos/generated-plan-bowl-arrangement.mp4" type="video/mp4">
+            </video>
+            <figcaption>Pick up the red block and place it into the right bowl.</figcaption>
+          </figure>
+
+          <figure class="carousel-slide">
+            <video controls playsinline preload="metadata">
+              <source src="assets/videos/generated-plan-sweatshirt.mp4" type="video/mp4">
+            </video>
+            <figcaption>Fold the clothing upwards from the bottom edge using both arms.</figcaption>
+          </figure>
+
+        </div>
+
+        <button class="carousel-arrow carousel-next" type="button" aria-label="Next video">&#10095;</button>
+      </div>
+
+      <div class="carousel-dots" aria-label="Generated video plan carousel navigation">
+        <button class="carousel-dot is-active" type="button" aria-label="Show video 1"></button>
+        <button class="carousel-dot" type="button" aria-label="Show video 2"></button>
+        <button class="carousel-dot" type="button" aria-label="Show video 3"></button>
+        <button class="carousel-dot" type="button" aria-label="Show video 4"></button>
+        <button class="carousel-dot" type="button" aria-label="Show video 5"></button>
+        <button class="carousel-dot" type="button" aria-label="Show video 6"></button>
+        <button class="carousel-dot" type="button" aria-label="Show video 7"></button>
+      </div>
+    </section>
+
+    <section id="novel-task-rollouts" class="section-shell content-shell content-section reveal">
+      <div class="section-header section-header-centered">
+        <h2 class="section-title-simple">Novel task rollouts</h2>
+      </div>
+      <p class="section-subtitle">
+        We can generate richer initial observations, which in turn enable the generation of more diverse novel task rollouts.
+      </p>
+      <div class="video-carousel body-card" data-carousel>
+        <button class="carousel-arrow carousel-prev" type="button" aria-label="Previous video">&#10094;</button>
+
+        <div class="carousel-viewport">
+          <figure class="carousel-slide is-active">
+            <video controls playsinline preload="metadata">
+              <source src="assets/videos/novel-rollout-shoe-placement.mp4" type="video/mp4">
+            </video>
+            <figcaption>Grasp the cup and pour coffee into the basket.</figcaption>
+          </figure>
+
+
+
+          <figure class="carousel-slide">
+            <video controls playsinline preload="metadata">
+              <source src="assets/videos/novel-rollout-plush-basket.mp4" type="video/mp4">
+            </video>
+            <figcaption>Spread strawberries on the bread.</figcaption>
+          </figure>
+
+          <figure class="carousel-slide">
+            <video controls playsinline preload="metadata">
+              <source src="assets/videos/novel-rollout-fold-cloth.mp4" type="video/mp4">
+            </video>
+            <figcaption>Lift the box lid with both arms.</figcaption>
+          </figure>
+
+
+
+          <figure class="carousel-slide">
+            <video controls playsinline preload="metadata">
+              <source src="assets/videos/novel-rollout-clear-tray.mp4" type="video/mp4">
+            </video>
+            <figcaption>Press the yellow button with the left arm.</figcaption>
+          </figure>
+
+          <figure class="carousel-slide">
+            <video controls playsinline preload="metadata">
+              <source src="assets/videos/novel-rollout-open-lid.mp4" type="video/mp4">
+            </video>
+            <figcaption>Grasp the teddy bear and put it into the basket.</figcaption>
+          </figure>
+
+          <figure class="carousel-slide">
+            <video controls playsinline preload="metadata">
+              <source src="assets/videos/novel-rollout-bowl-transfer.mp4" type="video/mp4">
+            </video>
+            <figcaption>Grasp an apple and put it into the basket.</figcaption>
+          </figure>
+        </div>
+
+        <button class="carousel-arrow carousel-next" type="button" aria-label="Next video">&#10095;</button>
+      </div>
+
+      <div class="carousel-dots" aria-label="Novel task rollout carousel navigation">
+        <button class="carousel-dot is-active" type="button" aria-label="Show video 1"></button>
+        <button class="carousel-dot" type="button" aria-label="Show video 2"></button>
+        <button class="carousel-dot" type="button" aria-label="Show video 3"></button>
+        <button class="carousel-dot" type="button" aria-label="Show video 4"></button>
+        <button class="carousel-dot" type="button" aria-label="Show video 5"></button>
+        <button class="carousel-dot" type="button" aria-label="Show video 6"></button>
+      </div>
+    </section>
+
+    <section id="qualitative-comparisons" class="section-shell content-shell content-section reveal">
+      <div class="section-header section-header-centered">
+        <h2 class="section-title-simple">Qualitative Comparisons</h2>
+      </div>
+      <div class="comparison-matrix">
+        <div class="comparison-corner" aria-hidden="true"></div>
+        <div class="comparison-task-title">Open the laptop</div>
+        <div class="comparison-task-title">Put the shoes into the shoebox</div>
+        <div class="comparison-task-title">Place the fork on the tray</div>
+
+        <div class="comparison-method">EVA</div>
+        <div class="comparison-video-cell body-card task-open">
+          <video src="assets/videos/qual-open-laptop-eva.mp4" muted loop autoplay playsinline preload="metadata" data-hover-controls></video>
+        </div>
+        <div class="comparison-video-cell body-card task-shoes">
+          <video src="assets/videos/qual-shoes-eva.mp4" muted loop autoplay playsinline preload="metadata" data-hover-controls></video>
+        </div>
+        <div class="comparison-video-cell body-card task-fork">
+          <video src="assets/videos/qual-fork-eva.mp4" muted loop autoplay playsinline preload="metadata" data-hover-controls></video>
+        </div>
+
+        <div class="comparison-method">EVA (w/o RL)</div>
+        <div class="comparison-video-cell body-card task-open">
+          <video src="assets/videos/qual-open-laptop-eva-wo-rl.mp4" muted loop autoplay playsinline preload="metadata" data-hover-controls></video>
+        </div>
+        <div class="comparison-video-cell body-card task-shoes">
+          <video src="assets/videos/qual-shoes-eva-wo-rl.mp4" muted loop autoplay playsinline preload="metadata" data-hover-controls></video>
+        </div>
+        <div class="comparison-video-cell body-card task-fork">
+          <video src="assets/videos/qual-fork-eva-wo-rl.mp4" muted loop autoplay playsinline preload="metadata" data-hover-controls></video>
+        </div>
+
+        <div class="comparison-method">Vidar</div>
+        <div class="comparison-video-cell body-card task-open">
+          <video src="assets/videos/qual-open-laptop-vidar.mp4" muted loop autoplay playsinline preload="metadata" data-hover-controls></video>
+        </div>
+        <div class="comparison-video-cell body-card task-shoes">
+          <video src="assets/videos/qual-shoes-vidar.mp4" muted loop autoplay playsinline preload="metadata" data-hover-controls></video>
+        </div>
+        <div class="comparison-video-cell body-card task-fork">
+          <video src="assets/videos/qual-fork-vidar.mp4" muted loop autoplay playsinline preload="metadata" data-hover-controls></video>
+        </div>
+
+        <div class="comparison-method">LVP</div>
+        <div class="comparison-video-cell body-card task-open">
+          <video src="assets/videos/qual-open-laptop-lvp.mp4" muted loop autoplay playsinline preload="metadata" data-hover-controls></video>
+        </div>
+        <div class="comparison-video-cell body-card task-shoes">
+          <video src="assets/videos/qual-shoes-lvp.mp4" muted loop autoplay playsinline preload="metadata" data-hover-controls></video>
+        </div>
+        <div class="comparison-video-cell body-card task-fork">
+          <video src="assets/videos/qual-fork-lvp.mp4" muted loop autoplay playsinline preload="metadata" data-hover-controls></video>
+        </div>
+      </div>
+    </section>
+
+    <section id="real-world-experiments" class="section-shell content-shell content-section reveal">
+      <div class="section-header section-header-centered">
+        <h2 class="section-title-simple">Real-world Experiments</h2>
+      </div>
+      <div class="video-grid two-up real-world-grid">
+        <article class="video-card body-card">
+          <video
+            src="assets/videos/real-toy-processed.mp4"
+            poster="assets/images/posters/real-toy.jpg"
+            muted
+            loop
+            autoplay
+            playsinline
+            preload="metadata"
+            data-hover-controls
+          ></video>
+          <h3>Plush Toy Placement</h3>
+          <p>Real-robot execution on the plush toy task.</p>
+        </article>
+
+        <article class="video-card body-card">
+          <video
+            src="assets/videos/real-pour-water-processed.mp4"
+            poster="assets/images/posters/real-pour-water.jpg"
+            muted
+            loop
+            autoplay
+            playsinline
+            preload="metadata"
+            data-hover-controls
+          ></video>
+          <h3>Pour Water</h3>
+          <p>Real-world pouring result with stable long-horizon control.</p>
+        </article>
+      </div>
+    </section>
+
+    <section id="reward-analysis" class="section-shell content-shell content-section reveal">
+      <div class="section-header section-header-centered">
+        <h2 class="section-title-simple">Reward Analysis</h2>
+      </div>
+      <div class="prose-card reward-analysis-copy">
+        <p>
+          EVA uses the inverse-dynamics reward as a dense alignment signal during post-training. The resulting reward
+          is not only predictive of downstream execution success, but also correlates with visually cleaner and more
+          physically consistent robot rollouts. The plots below summarize these two trends on our evaluation set.
+        </p>
+      </div>
+      <div class="figure-grid reward-analysis-grid">
+        <figure class="body-card figure-card">
+          <img src="assets/images/succ_vs_reward.png" alt="Success rate versus executability-aware reward.">
+          <figcaption>Higher reward is consistently associated with better task success in execution.</figcaption>
+        </figure>
+
+        <figure class="body-card figure-card">
+          <img src="assets/images/visual_vs_reward.png" alt="Visual quality compared against executability-aware reward.">
+          <figcaption>Reward also tracks improvements in visual plausibility and reduced embodiment artifacts.</figcaption>
+        </figure>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <p>EVA project page.</p>
+  </footer>
+
+  <script src="assets/js/site-final-20260318.js"></script>
+</body>
+</html>
