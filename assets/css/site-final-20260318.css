@@ -843,7 +843,8 @@ video[data-hover-controls]:focus::-webkit-media-controls-enclosure,
 }
 
 .citation-card {
-  max-width: 66rem;
+  width: calc(100% - 5rem);
+  max-width: 61rem;
   margin: 0 auto;
   border-color: rgba(255, 255, 255, 0.72);
   background: rgba(255, 255, 255, 0.58);
